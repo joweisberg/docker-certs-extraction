@@ -1,7 +1,7 @@
 Docker certificates extraction for Traefik
 ============
 
-Generate certificates from [Traefik](https://docs.traefik.io/) docker from json to crt, key, pem, pfx and like acme.sh
+Generate certificates based on [Traefik](https://docs.traefik.io/) docker from json file to crt, key, pem, pfx and like acme.sh
 
 A certs-extraction container is available. It includes the latest development HEAD version. You can use it to manage certificates.
 
