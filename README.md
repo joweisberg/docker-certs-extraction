@@ -1,4 +1,4 @@
-Docker certificates extraction for Traefik
+Docker certificates extraction based on Traefik
 ============
 
 Generate certificates based on [Traefik](https://docs.traefik.io/) docker from json file to crt, key, pem, pfx and like acme.sh
