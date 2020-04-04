@@ -51,7 +51,7 @@ Get the container:
 
 Run the container in *console mode* (notice the environment variable setting parameters for the startup command):
 
-    docker run -d --restart="always" -e DOMAIN="sub.example.com" -v /var/docker/traefik:/mnt/data joweisberg/certs-extraction
+    docker run -d --restart="unless-stopped" -e DOMAIN="sub.example.com" -v /var/docker/traefik:/mnt/data joweisberg/certs-extraction
 
 Docker-compose
 ---------------------
