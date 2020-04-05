@@ -52,7 +52,7 @@ Run the container in *console mode* (notice the environment variable setting par
 $ docker run -d --restart="unless-stopped" -e DOMAIN="sub.example.com" -v /var/docker/traefik:/mnt/data joweisberg/certs-extraction
 ```
 
-### Docker-compose
+### Docker Compose
 
 ```yml
 version: "3.5"
