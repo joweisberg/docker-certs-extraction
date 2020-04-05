@@ -1,5 +1,4 @@
-Docker certificates extraction based on Traefik
-============
+# Docker certificates extraction based on Traefik
 
 Generate certificates based on [Traefik](https://docs.traefik.io/) docker from json file to crt, key, pem, pfx and like acme.sh
 
@@ -35,41 +34,42 @@ The environmental variables are as follows:
 * `DOMAIN`: The domain name that you are updating. ie. sub.example.com
 * `ACME_COPY`: the mounted volume to copy acme folder content. Use | separator for multiples folders (need to be mounted as volume on Docker)
 
-Installation via Docker
-============
+## Installation via Docker
 
 Please follow the official documentation:
 
     https://docs.docker.com/install/
 
-Docker
----------------------
+### Docker
 
 Get the container:
-
-    docker pull joweisberg/certs-extraction
+```bash
+$ docker pull joweisberg/certs-extraction
+```
 
 Run the container in *console mode* (notice the environment variable setting parameters for the startup command):
+```bash
+$ docker run -d --restart="unless-stopped" -e DOMAIN="sub.example.com" -v /var/docker/traefik:/mnt/data joweisberg/certs-extraction
+```
 
-    docker run -d --restart="unless-stopped" -e DOMAIN="sub.example.com" -v /var/docker/traefik:/mnt/data joweisberg/certs-extraction
+### Docker-compose
 
-Docker-compose
----------------------
-
-    version: "3.5"
-    services:
-      certs-extraction:
-        container_name: certs-extraction
-        image: joweisberg/certs-extraction:latest
-        restart: unless-stopped
-        environment:
-          - DOMAIN=sub.example.com
-          - ACME_COPY=/mnt/certs-to-copy
-        healthcheck:
-          test: ["CMD", "/usr/bin/healthcheck"]
-          interval: 30s
-          timeout: 10s
-          retries: 5
-        volumes:
-          - /var/docker/traefik:/mnt/data
-          - /mnt/certs-to-copy:/mnt/certs-to-copy
+```yml
+version: "3.5"
+services:
+  certs-extraction:
+    container_name: certs-extraction
+    image: joweisberg/certs-extraction:latest
+    restart: unless-stopped
+    environment:
+      - DOMAIN=sub.example.com
+      - ACME_COPY=/mnt/certs-to-copy
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /var/docker/traefik:/mnt/data
+        - /mnt/certs-to-copy:/mnt/certs-to-copy
+```
