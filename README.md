@@ -4,12 +4,6 @@ Generate certificates based on [Traefik](https://docs.traefik.io/) docker from j
 
 A certs-extraction container is available. It includes the latest development HEAD version. You can use it to manage certificates.
 
-## Available only for Docker
-
-This Docker image uses the correct latest version!
-- ``aarch64`` (Rapsberry Pi 4 B w/ Ubuntu 18.04 LTS, Docker 19.03) -- image: joweisberg/certs-extraction:arm64
-- ``amd64`` (Linux Ubuntu 18.04 LTS, Docker 19.03) -- image: joweisberg/certs-extraction:latest
-
 Prerequisite:
 
 * Generate certificates by [Traefik](https://docs.traefik.io/)
@@ -45,6 +39,12 @@ The environmental variables are as follows:
 Please follow the official documentation:
 
     https://docs.docker.com/install/
+
+### Docker image platform
+
+This Docker image uses the correct latest version!
+- ``aarch64`` (Rapsberry Pi 4 B w/ Ubuntu 18.04 LTS, Docker 19.03) -- image: joweisberg/certs-extraction:arm64
+- ``amd64`` (Linux Ubuntu 18.04 LTS, Docker 19.03) -- image: joweisberg/certs-extraction:latest
 
 ### Docker
 
