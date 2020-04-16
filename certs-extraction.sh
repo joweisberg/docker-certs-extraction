@@ -13,7 +13,7 @@ CERTS=/mnt/data/certs
 ACME=/mnt/data/acme
 ACME_JSON_MD5=$(md5sum $ACME_JSON | awk '{print $1}')
 # Run jq command via docker
-jq="docker run --rm -i local/jq -c"
+jq="docker run -i local/jq"
 jq="jq"
 
 
