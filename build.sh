@@ -17,12 +17,14 @@ FILE_LOG="/var/log/$FILE_NAME.log"
 
 DOCKER_USER="joweisberg"
 
-if [ -z "$1" ]; then
-  echo "* Require one parameter as respository name:"
+if [ -z "$1" ] || [ -z "$(echo $1 | grep '/')" ]; then
+  echo "* Require one parameter as <docker_user/docker_respository>:"
   # ./build.sh certs-extraction
-  echo "* ./$(basename $0) $(echo ${FILE_PATH##*/} | sed 's/docker-//g')"
+  echo "* ./$(basename $0) $DOCKER_USER/$(echo ${FILE_PATH##*/} | sed 's/docker-//g')"
   exit 1
 fi
+DOCKER_USER=$(echo $1 | cut -d'/' -f1)
+DOCKER_REPO=$(echo $1 | cut -d'/' -f2)
 
 if [ $(apt list --installed 2> /dev/null | grep qemu | wc -l) -eq 0 ]; then
   echo "* Running ARM containers"
@@ -55,17 +57,17 @@ done
 
 echo "* Building and tagging individual images"
 for arch in amd64 arm32v6 arm64v8; do
-  docker build -f Dockerfile.${arch} -t $DOCKER_USER/$1:${arch}-latest .
+  docker build -f Dockerfile.${arch} -t $DOCKER_USER/$DOCKER_REPO:${arch}-latest .
   if [ $? -ne 0 ]; then
-    echo "* Error on building image $1"
+    echo "* Error on building image $DOCKER_USER/$DOCKER_REPO:${arch}-latest"
     exit 1
   fi
-  docker push $DOCKER_USER/$1:${arch}-latest
+  docker push $DOCKER_USER/$DOCKER_REPO:${arch}-latest
 done
 
 echo "* Building a multi-arch manifest"
-docker manifest create --amend $DOCKER_USER/$1:latest $DOCKER_USER/$1:amd64-latest $DOCKER_USER/$1:arm32v6-latest $DOCKER_USER/$1:arm64v8-latest
-docker manifest push --purge $DOCKER_USER/$1:latest
+docker manifest create --amend $DOCKER_USER/$DOCKER_REPO:latest $DOCKER_USER/$DOCKER_REPO:amd64-latest $DOCKER_USER/$DOCKER_REPO:arm32v6-latest $DOCKER_USER/$DOCKER_REPO:arm64v8-latest
+docker manifest push --purge $DOCKER_USER/$DOCKER_REPO:latest
 
 echo "* Cleanup unnecessary files"
 rm -f Dockerfile.a* qemu-* x86_64_qemu-*
