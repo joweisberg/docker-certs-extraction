@@ -3,9 +3,9 @@ MAINTAINER Jonathan Weisberg <jo.weisberg@gmail.com>
 
 __CROSS_COPY qemu-__QEMU_ARCH__-static /usr/bin
 RUN apk --no-cache --update add \
-      bash \
-      openssl \
-      jq
+    bash \
+    openssl \
+    jq
 
 WORKDIR /root
 VOLUME /mnt/data
