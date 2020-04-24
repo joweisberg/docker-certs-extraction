@@ -19,7 +19,8 @@ DOCKER_USER="joweisberg"
 
 if [ -z "$1" ]; then
   echo "* Require one parameter as respository name:"
-  echo "* ./$(basename $0) $DOCKER_USER/${FILE_PATH##*/}"
+  # ./build.sh certs-extraction
+  echo "* ./$(basename $0) $(echo ${FILE_PATH##*/} | sed 's/docker-//g')"
   exit 1
 fi
 
