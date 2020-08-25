@@ -42,6 +42,8 @@ do
           CERTS=$CERTS_HOME/$DOMAIN
           ACME=$ACME_HOME/$DOMAIN
         fi
+        mkdir -p $CERTS
+        mkdir -p $ACME
 
         echo "[ CERTS ] Configuration file changed. Generate certificates for $DOMAIN..."
         echo "[ CERTS ] Start time: $(date)"
