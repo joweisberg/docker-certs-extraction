@@ -15,7 +15,7 @@ Steps:
 3. Copy certificates like acme.sh under acme/
 4. Duplicate acme certificates under `ACME_COPY`
 
-Example:
+Example (DOMAIN=sub.example.com):
 
     /var/docker/traefik
       - acme.json
@@ -30,8 +30,33 @@ Example:
         - sub.example.com.key
         - sub.example.com.cer
 
+  Example (DOMAIN=sub.example.com|sub1.example.com):
+
+      /var/docker/traefik
+        - acme.json
+        certs/sub.example.com/
+          - ssl-cert.key
+          - ssl-cert.crt
+          - ssl-cert.pem
+          - ssl-cert.pfx
+        certs/sub1.example.com/
+          - ssl-cert.key
+          - ssl-cert.crt
+          - ssl-cert.pem
+          - ssl-cert.pfx
+        acme/sub.example.com/
+          - ca.cer
+          - fullchain.cer
+          - sub.example.com.key
+          - sub.example.com.cer
+        acme/sub1.example.com/
+          - ca.cer
+          - fullchain.cer
+          - sub1.example.com.key
+          - sub1.example.com.cer
+
 The environmental variables are as follows:
-* `DOMAIN`: The domain name that you are updating. ie. sub.example.com
+* `DOMAIN`: The domain name that you are updating. ie. sub.example.com. Use | separator for multiples domains
 * `ACME_COPY`: the mounted volume to copy acme folder content. Use | separator for multiples folders (need to be mounted as volume on Docker)
 
 ## Installation via Docker
@@ -70,8 +95,8 @@ services:
     image: joweisberg/certs-extraction:latest
     restart: unless-stopped
     environment:
-      - DOMAIN=sub.example.com
-      - ACME_COPY=/mnt/certs-to-copy
+      - DOMAIN=sub.example.com|sub1.example.com|sub2.example.com
+      - ACME_COPY=/mnt/certs-to-copy|/mnt/certs-to-copy1|/mnt/certs-to-copy2
     healthcheck:
       test: ["CMD", "/usr/bin/healthcheck"]
       interval: 30s
@@ -79,5 +104,7 @@ services:
       retries: 5
     volumes:
       - /var/docker/traefik:/mnt/data
-        - /mnt/certs-to-copy:/mnt/certs-to-copy
+      - /mnt/certs-to-copy:/mnt/certs-to-copy
+      - /mnt/certs-to-copy1:/mnt/certs-to-copy1
+      - /mnt/certs-to-copy2:/mnt/certs-to-copy2
 ```
