@@ -23,8 +23,7 @@ jq="jq"
 echo ""
 echo "[ CERTS ] Command: $0 $@"
 
-while true
-do
+while true; do
   sleep 3
   if [ -f $ACME_JSON ]; then
     MD5=$(md5sum $ACME_JSON | awk '{print $1}')
