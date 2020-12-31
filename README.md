@@ -15,7 +15,7 @@ Steps:
 3. Copy certificates like acme.sh under acme/
 4. Duplicate acme certificates under `ACME_COPY`
 
-Example (DOMAIN=sub.example.com):
+Example:
 
     /var/docker/traefik
       - acme.json
@@ -30,33 +30,9 @@ Example (DOMAIN=sub.example.com):
         - sub.example.com.key
         - sub.example.com.cer
 
-  Example (DOMAIN=sub.example.com|sub1.example.com):
-
-      /var/docker/traefik
-        - acme.json
-        certs/sub.example.com/
-          - ssl-cert.key
-          - ssl-cert.crt
-          - ssl-cert.pem
-          - ssl-cert.pfx
-        certs/sub1.example.com/
-          - ssl-cert.key
-          - ssl-cert.crt
-          - ssl-cert.pem
-          - ssl-cert.pfx
-        acme/sub.example.com/
-          - ca.cer
-          - fullchain.cer
-          - sub.example.com.key
-          - sub.example.com.cer
-        acme/sub1.example.com/
-          - ca.cer
-          - fullchain.cer
-          - sub1.example.com.key
-          - sub1.example.com.cer
-
 The environmental variables are as follows:
-* `DOMAIN`: The domain name that you are updating. ie. sub.example.com. Use | separator for multiples domains
+* `-e TZ` - name of the TimeZone - ie. "Etc/UTC" or "Europe/Paris" (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+* `DOMAIN`: The domain name that you are updating - ie. sub.example.com
 * `ACME_COPY`: the mounted volume to copy acme folder content. Use | separator for multiples folders (need to be mounted as volume on Docker)
 
 ## Installation via Docker
@@ -68,10 +44,10 @@ Please follow the official documentation:
 ### Docker image platform / architecture
 
 The Docker image to use `joweisberg/certs-extraction:latest`.
-Build on Linux Ubuntu 18.04 LTS, Docker 19.03 for:
+Build on Linux Ubuntu 20.04 LTS, Docker 19.03 for:
 - `x86_64` / `amd64`
 - `aarch64` / `arm64v8`
-- `arm` / `arm32v7`
+- `arm` / `arm32v6`
 
 ### Docker
 
@@ -82,7 +58,7 @@ $ docker pull joweisberg/certs-extraction:latest
 
 Run the container in *console mode* (notice the environment variable setting parameters for the startup command):
 ```bash
-$ docker run -d --restart="unless-stopped" -e DOMAIN="sub.example.com" -v /var/docker/traefik:/mnt/data joweisberg/certs-extraction:latest
+$ docker run -d --restart="unless-stopped" -e TZ="Europe/Paris" -e DOMAIN="sub.example.com" -v /var/docker/traefik:/mnt/data joweisberg/certs-extraction:latest
 ```
 
 ### Docker Compose
@@ -95,8 +71,9 @@ services:
     image: joweisberg/certs-extraction:latest
     restart: unless-stopped
     environment:
-      - DOMAIN=sub.example.com|sub1.example.com|sub2.example.com
-      - ACME_COPY=/mnt/certs-to-copy|/mnt/certs-to-copy1|/mnt/certs-to-copy2
+      - TZ=Europe/Paris
+      - DOMAIN=sub.example.com
+      - ACME_COPY=/mnt/certs-to-copy
     healthcheck:
       test: ["CMD", "/usr/bin/healthcheck"]
       interval: 30s
@@ -104,7 +81,5 @@ services:
       retries: 5
     volumes:
       - /var/docker/traefik:/mnt/data
-      - /mnt/certs-to-copy:/mnt/certs-to-copy
-      - /mnt/certs-to-copy1:/mnt/certs-to-copy1
-      - /mnt/certs-to-copy2:/mnt/certs-to-copy2
+        - /mnt/certs-to-copy:/mnt/certs-to-copy
 ```
