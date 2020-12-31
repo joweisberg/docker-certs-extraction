@@ -31,7 +31,7 @@ Example:
         - sub.example.com.cer
 
 The environmental variables are as follows:
-* `-e TZ` - name of the TimeZone - ie. "Etc/UTC" or "Europe/Paris" (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+* `TZ`: name of the TimeZone - ie. "Etc/UTC" or "Europe/Paris" (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 * `DOMAIN`: The domain name that you are updating - ie. sub.example.com
 * `ACME_COPY`: the mounted volume to copy acme folder content. Use | separator for multiples folders (need to be mounted as volume on Docker)
 
