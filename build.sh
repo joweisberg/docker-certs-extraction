@@ -53,11 +53,11 @@ echo "* Cleanup previous temporary files"
 rm -f Dockerfile.a* qemu-* x86_64_qemu-*
 
 echo "* Create different Dockerfile per architecture"
-for docker_arch in amd64 arm32v6 arm64v8; do
+for docker_arch in amd64 arm32 arm64; do
   case ${docker_arch} in
     amd64   ) qemu_arch="x86_64" ;;
-    arm32v6 ) qemu_arch="arm" ;;
-    arm64v8 ) qemu_arch="aarch64" ;;    
+    arm32 ) qemu_arch="arm" ;;
+    arm64 ) qemu_arch="aarch64" ;;    
   esac
   cp Dockerfile.cross Dockerfile.${docker_arch}
   sed -i "s|__BASEIMAGE_ARCH__|${docker_arch}|g" Dockerfile.${docker_arch}
@@ -69,21 +69,28 @@ for docker_arch in amd64 arm32v6 arm64v8; do
   fi
 done
 
+# Fix for system architecture
+sed -i "s|^FROM arm32/|FROM arm32v7/|g" Dockerfile.arm32
+sed -i "s|^FROM arm64/|FROM arm64v8/|g" Dockerfile.arm64
+# Fix for docker-dnsmaq / line 7# webproc: arm32 -> armv7
+sed -i "7s|arm32|armv7|g" Dockerfile.arm32
+
 echo "* Download OS architecture qmenu"
-echo "* qemu-user-static latest versions:"
-git ls-remote --tags --refs https://github.com/multiarch/qemu-user-static.git | cut -d'v' -f2 | sort -nr 2> /dev/null | head -n5
 # Get qemu-user-static latest version
 if [ -f ./.qemu_ver.txt ]; then
   qemu_ver=$(cat ./.qemu_ver.txt)
 else
+  echo "* qemu-user-static latest versions:"
+  git ls-remote --tags --refs https://github.com/multiarch/qemu-user-static.git | cut -d'v' -f2 | sort -nr 2> /dev/null | head -n5
   qemu_ver=$(git ls-remote --tags --refs https://github.com/multiarch/qemu-user-static.git | cut -d'v' -f2 | sort -nr 2> /dev/null | head -n1)
+
+  echo -n "* Enter qemu-user-static version <${qemu_ver}>? "
+  read answer
+  if [ -n "$answer" ]; then
+    qemu_ver=$answer
+  fi
+  echo ${qemu_ver} > ./.qemu_ver.txt
 fi
-echo -n "* Enter qemu-user-static version <${qemu_ver}>? "
-read answer
-if [ -n "$answer" ]; then
-  qemu_ver=$answer
-fi
-echo ${qemu_ver} > ./.qemu_ver.txt
 for target_arch in x86_64 arm aarch64; do
   wget -Nq https://github.com/multiarch/qemu-user-static/releases/download/v${qemu_ver}/x86_64_qemu-${target_arch}-static.tar.gz
   tar -xvf x86_64_qemu-${target_arch}-static.tar.gz
@@ -93,7 +100,7 @@ for target_arch in x86_64 arm aarch64; do
 done
 
 echo "* Building and tagging individual images"
-for docker_arch in amd64 arm32v6 arm64v8; do
+for docker_arch in amd64 arm32 arm64; do
   if [ ${docker_arch} == "amd64" ]; then
     docker build -f Dockerfile.${docker_arch} -t $DOCKER_USER/$DOCKER_REPO:latest .
     if [ $? -ne 0 ]; then
@@ -111,7 +118,7 @@ for docker_arch in amd64 arm32v6 arm64v8; do
 done
 
 echo "* Building a multi-arch manifest"
-docker manifest create --amend $DOCKER_USER/$DOCKER_REPO:latest $DOCKER_USER/$DOCKER_REPO:amd64-latest $DOCKER_USER/$DOCKER_REPO:arm32v6-latest $DOCKER_USER/$DOCKER_REPO:arm64v8-latest
+docker manifest create --amend $DOCKER_USER/$DOCKER_REPO:latest $DOCKER_USER/$DOCKER_REPO:amd64-latest $DOCKER_USER/$DOCKER_REPO:arm32-latest $DOCKER_USER/$DOCKER_REPO:arm64-latest
 docker manifest push --purge $DOCKER_USER/$DOCKER_REPO:latest
 
 echo "* Cleanup unnecessary files"
@@ -128,6 +135,8 @@ echo -n "* Remove QEMU user emulation package? [y/N]"
 read answer
 if [ -n "$(echo $answer | grep -i '^y')" ]; then
   sudo apt -y remove --autoremove qemu-user
+  sudo rm -f ./.qemu_ver.txt
+  sudo rm -f ./.binfmt_misc.txt
 fi
 
 exit 0

@@ -43,22 +43,25 @@ Please follow the official documentation:
 
 ### Docker image platform / architecture
 
-The Docker image to use `joweisberg/certs-extraction:latest`.
-Build on Linux Ubuntu 20.04 LTS, Docker 19.03 for:
-- `x86_64` / `amd64`
-- `aarch64` / `arm64v8`
-- `arm` / `arm32v6`
+The Docker image to use `joweisberg/certs-extraction:amd64`.
+Build on Linux Ubuntu 20.04 LTS, Docker 19.03 and above for:
+
+| Platform | Architecture / Tags |
+|---|---|
+| x86_64 | amd64 |
+| aarch64 | arm64 |
+| arm | arm32 |
 
 ### Docker
 
 Get the container:
 ```bash
-$ docker pull joweisberg/certs-extraction:latest
+$ docker pull joweisberg/certs-extraction:amd64
 ```
 
 Run the container in *console mode* (notice the environment variable setting parameters for the startup command):
 ```bash
-$ docker run -d --restart="unless-stopped" -e TZ="Europe/Paris" -e DOMAIN="sub.example.com" -v /var/docker/traefik:/mnt/data joweisberg/certs-extraction:latest
+$ docker run -d --restart="unless-stopped" -e TZ="Europe/Paris" -e DOMAIN="sub.example.com" -v /var/docker/traefik:/mnt/data joweisberg/certs-extraction:amd64
 ```
 
 ### Docker Compose
@@ -68,7 +71,7 @@ version: "3.5"
 services:
   certs-extraction:
     container_name: certs-extraction
-    image: joweisberg/certs-extraction:latest
+    image: joweisberg/certs-extraction:amd64
     restart: unless-stopped
     environment:
       - TZ=Europe/Paris
