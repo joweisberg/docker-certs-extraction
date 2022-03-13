@@ -1,27 +1,42 @@
 #!/bin/bash
 #
+# export DOMAINS=sub.domain.com
 # ./certs-extraction.sh > /var/log/certs-extraction.log 2>&1 &
 #
 
-# Source .env file
-. /mnt/data/.env > /dev/null 2>&1
-# Variables
+###############################################################################
+### Environment Variables
+
 START_LOG=1
 START_INIT=1
-ACME_JSON=/mnt/data/acme.json
-CERTS=/mnt/data/certs
-ACME=/mnt/data/acme
+CERTS_PATH=${CERTS_PATH:-/mnt/data}
+ACME_JSON=$CERTS_PATH/acme.json
+CERTS=$CERTS_PATH/certs
+ACME=$CERTS_PATH/acme
 ACME_JSON_MD5=$(md5sum $ACME_JSON | awk '{print $1}')
-DOMAINS=$DOMAIN
 CERTS_HOME=$CERTS
 ACME_HOME=$ACME
 # Run jq command via docker
 jq="docker run -i local/jq"
 jq="jq"
 
+###############################################################################
+### Pre-Script
+
+# List of DOMAIN based on space delimiter
+DOMAINS=${DOMAINS:-sub.domain.com}
+if [ -n "$(echo $1 | grep '\-d=')" ] || [ -n "$(echo $1 | grep '\--domains=')" ]; then
+  # $1 = "--domains=sub.domain.com"
+  # Get the value after =
+  DOMAINS=${1#*=}
+fi
+
+###############################################################################
+### Script
 
 echo ""
 echo "[ CERTS ] Command: $0 $@"
+echo "[ CERTS ] DOMAINS to listen: $DOMAINS"
 
 while true; do
   sleep 3

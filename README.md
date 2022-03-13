@@ -95,5 +95,5 @@ services:
       retries: 5
     volumes:
       - /var/docker/traefik:/mnt/data
-        - /mnt/certs-to-copy:/mnt/certs-to-copy
+      - /mnt/certs-to-copy:/mnt/certs-to-copy
 ```
