@@ -86,7 +86,7 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Europe/Paris
-      - DOMAIN=sub.example.com
+      - DOMAINS=sub1.example.com sub2.example.com
       - ACME_COPY=/mnt/certs-to-copy
     healthcheck:
       test: ["CMD", "/usr/bin/healthcheck"]
