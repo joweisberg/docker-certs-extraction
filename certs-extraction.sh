@@ -40,8 +40,9 @@ echo "[ CERTS ] DOMAINS to listen: $DOMAINS"
 
 while true; do
   sleep 3
-  if [ -f $ACME_JSON ]; then
-    MD5=$(md5sum $ACME_JSON | awk '{print $1}')
+  if [ -f $ACME_JSON ] || [ -f $CERTS_PATH/$FILE_CRT ]; then
+    [ -f $ACME_JSON ] && MD5=$(md5sum $ACME_JSON | awk '{print $1}')
+    [ -f $CERTS_PATH/$FILE_CRT ] && MD5=$(md5sum $CERTS_PATH/$FILE_CRT | awk '{print $1}')
 
     if [ $START_INIT -eq 1 ] || [ $ACME_JSON_MD5 != $MD5 ]; then
 
@@ -66,10 +67,17 @@ while true; do
         START_INIT=0
         ACME_JSON_MD5=$MD5
 
-        echo "[ CERTS ] Extracting and saving Key"
-        cat $ACME_JSON | $jq -r ".[].Certificates[] | select(.domain.main==\"$DOMAIN\") | .key" | base64 -d > $CERTS/ssl-cert.key
-        echo "[ CERTS ] Extracting and saving Certificate"
-        cat $ACME_JSON | $jq -r ".[].Certificates[] | select(.domain.main==\"$DOMAIN\") | .certificate" | base64 -d > $CERTS/ssl-cert.crt
+        if [ -f $CERTS_PATH/$FILE_KEY ] && [ -f $CERTS_PATH/$FILE_CRT ]; then
+          echo "[ CERTS ] Saving Key FILE_KEY=$FILE_KEY"
+          cp $CERTS_PATH/$FILE_KEY $CERTS/ssl-cert.key
+          echo "[ CERTS ] Saving Certificate FILE_CRT=$FILE_CRT"
+          cp $CERTS_PATH/$FILE_CRT $CERTS/ssl-cert.crt
+        else
+          echo "[ CERTS ] Extracting and saving Key"
+          cat $ACME_JSON | $jq -r ".[].Certificates[] | select(.domain.main==\"$DOMAIN\") | .key" | base64 -d > $CERTS/ssl-cert.key
+          echo "[ CERTS ] Extracting and saving Certificate"
+          cat $ACME_JSON | $jq -r ".[].Certificates[] | select(.domain.main==\"$DOMAIN\") | .certificate" | base64 -d > $CERTS/ssl-cert.crt
+        fi
 
         echo "[ CERTS ] Convert a DER file (.crt .cer .der) to PEM"
         openssl x509 -in $CERTS/ssl-cert.crt -outform pem -out $CERTS/ssl-cert.pem
