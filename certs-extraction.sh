@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# export DOMAINS=sub.domain.com
+# export DOMAINS=domainA.com,sub.domainB.com
 # ./certs-extraction.sh > /var/log/certs-extraction.log 2>&1 &
 #
 
@@ -23,7 +23,7 @@ jq="jq"
 ###############################################################################
 ### Pre-Script
 
-# List of DOMAIN based on space delimiter
+# List of DOMAIN based on comma delimiter
 DOMAINS=${DOMAINS:-sub.domain.com}
 if [ -n "$(echo $1 | grep '\-d=')" ] || [ -n "$(echo $1 | grep '\--domains=')" ]; then
   # $1 = "--domains=sub.domain.com"
@@ -46,8 +46,8 @@ while true; do
     if [ $START_INIT -eq 1 ] || [ $ACME_JSON_MD5 != $MD5 ]; then
 
       # Set pipe as the delimiter
-      IFS='|'
-      #Read the split words into an array based on space delimiter
+      IFS=','
+      # Read the split words into an array based on the delimiter
       read -a DOMAIN_ARR <<< "$DOMAINS"
       # Print each value of the array by using the loop
       for DOMAIN in "${DOMAIN_ARR[@]}"; do
@@ -83,22 +83,6 @@ while true; do
         openssl pkcs12 -in $CERTS/ssl-cert.pfx -clcerts -nokeys -password pass: | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > $ACME/$DOMAIN.cer
         openssl pkcs12 -in $CERTS/ssl-cert.pfx -cacerts -nokeys -chain -password pass: | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > $ACME/ca.cer
         cat $ACME/$DOMAIN.cer > $ACME/fullchain.cer && echo "" >> $ACME/fullchain.cer && cat $ACME/ca.cer >> $ACME/fullchain.cer
-
-        if [ -n "$ACME_COPY" ]; then
-          # Set pipe as the delimiter
-          IFS='|'
-          #Read the split words into an array based on space delimiter
-          read -a COPY_ARR <<< "$ACME_COPY"
-          # Print each value of the array by using the loop
-          for P in "${COPY_ARR[@]}"; do
-            echo "[ CERTS ] Copy Key and Certificate to $P"
-            mkdir -p $P
-            cp -rf $ACME/* $P
-          done
-        fi
-
-        #echo "[ CERTS ] Restart services using new certificates"
-        #docker restart onlyoffice owncloud emby
 
         echo "[ CERTS ] End time: $(date)"
         runend=$(date +%s)
