@@ -1,10 +1,6 @@
 # syntax=docker/dockerfile:1.6
 
-ARG TARGETPLATFORM
-ARG TARGETARCH
-ARG TARGETOS
-
-FROM --platform=$TARGETPLATFORM alpine
+FROM alpine
 MAINTAINER Jonathan Weisberg <jo.weisberg@gmail.com>
 
 RUN apk --no-cache --update add bash tzdata openssl jq
