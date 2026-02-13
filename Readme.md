@@ -21,7 +21,6 @@ A certs-extraction container is available. It includes the latest development HE
 1. Detect change every 3s on acme.json file based on Traefik
 2. Extract crt, key, pem, pfx files under certs/
 3. Copy certificates like acme.sh under acme/
-4. Duplicate acme certificates under `ACME_COPY`
 
 Example:
 
@@ -42,7 +41,6 @@ Example:
 
 * `TZ`: name of the TimeZone - ie. "Etc/UTC" or "Europe/Paris" (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 * `DOMAIN`: The domain name that you are updating - ie. sub.example.com
-* `ACME_COPY`: the mounted volume to copy acme folder content. Use | separator for multiples folders (need to be mounted as volume on Docker)
 
 ## Installation via Docker
 
@@ -87,7 +85,6 @@ services:
     environment:
       - TZ=Europe/Paris
       - DOMAINS=sub1.example.com sub2.example.com
-      - ACME_COPY=/mnt/certs-to-copy
     healthcheck:
       test: ["CMD", "/usr/bin/healthcheck"]
       interval: 30s
@@ -95,5 +92,4 @@ services:
       retries: 5
     volumes:
       - /var/docker/traefik:/mnt/data
-      - /mnt/certs-to-copy:/mnt/certs-to-copy
 ```
